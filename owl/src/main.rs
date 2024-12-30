@@ -25,7 +25,7 @@ async fn main() {
     }
 
     let lvl = match cfg.log.level.as_str() {
-        "debug" => tracing::Level::TRACE,
+        "debug" => tracing::Level::DEBUG,
         "warn" => tracing::Level::WARN,
         "error" => tracing::Level::ERROR,
         _ => tracing::Level::INFO,

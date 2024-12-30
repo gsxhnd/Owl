@@ -1,13 +1,26 @@
+use crate::handler::response::HandlerResponse;
 use crate::state::AppState;
-use axum::{extract::State, response::IntoResponse, Json};
-use tracing::{debug, info};
+
+use axum::{extract::State, http::StatusCode, Json};
+use serde::Serialize;
+use tracing::{debug, error, info};
+
+#[derive(Debug, Clone, Serialize)]
+pub struct PingResp {
+    version: String,
+}
 
 #[utoipa::path(get, path = "/ping", tag = "default", responses())]
-pub(crate) async fn ping(state: State<AppState>) -> impl IntoResponse {
+pub(crate) async fn ping(state: State<AppState>) -> (StatusCode, Json<HandlerResponse<PingResp>>) {
     debug!("ping request");
 
-    // let a = state.db.db.version().await.unwrap();
-    // info!("version: {} ", a);
+    let v = match state.db.version().await {
+        Ok(version) => version,
+        Err(e) => {
+            error!("error: {}", e);
+            return HandlerResponse::internal_server_error();
+        }
+    };
 
-    Json("ok")
+    HandlerResponse::ok(PingResp { version: v })
 }

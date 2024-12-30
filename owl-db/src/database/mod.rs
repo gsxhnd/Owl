@@ -1,17 +1,16 @@
-use surrealdb::{
-    engine::local::{Db, RocksDb},
-    Surreal,
-};
+use thiserror::Error;
+pub mod sqlite;
 
-#[derive(Debug, Clone)]
-pub struct Database {
-    db: Surreal<Db>,
+#[derive(Debug, Error)]
+pub enum DatabaseError {
+    #[error("Database error: {0}")]
+    DbError(String),
 }
 
-impl Database {
-    pub async fn new() -> Self {
-        let db = Surreal::new::<RocksDb>("temp.db").await.unwrap();
-        db.use_ns("ows").await.unwrap();
-        Database { db }
+impl From<sqlx::Error> for DatabaseError {
+    fn from(value: sqlx::Error) -> Self {
+        DatabaseError::DbError(value.to_string())
     }
 }
+
+// pub trait Database {}

@@ -1,5 +1,5 @@
 [workspace]
-members = ["owl", "owl-db"]
+members = ["owl", "owl-db", "owl-store"]
 resolver = "2"
 
 [workspace.dependencies]
@@ -18,6 +18,13 @@ tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }
-surrealdb = { version = "2", features = ["kv-rocksdb"] }
+sqlx = { version = "0.8", features = [
+    "runtime-tokio",
+    "sqlite",
+    "derive",
+    "migrate",
+    "chrono",
+] }
+thiserror = { version = "2" }
 utoipa = { version = "5", features = ["axum_extras"] }
 walkdir = "2"
