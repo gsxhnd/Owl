@@ -2,7 +2,7 @@ use crate::database::DatabaseError;
 use sqlx::{
     migrate::Migrator,
     sqlite::{SqliteConnectOptions, SqlitePoolOptions},
-    ConnectOptions, Pool, Sqlite,
+    ConnectOptions, Pool, Row, Sqlite,
 };
 use std::path::Path;
 
@@ -21,14 +21,18 @@ impl Database {
         let pool_option = SqlitePoolOptions::new();
         let pool = pool_option.connect_with(conn_opt).await.unwrap();
 
+        let m = Migrator::new(Path::new("./migrations")).await.unwrap();
+        m.run(&pool).await.unwrap();
+
         Database { pool }
     }
 
     pub async fn version(&self) -> Result<String, DatabaseError> {
-        // match self.db.version().await {
-        //     Ok(version) => Ok(version.to_string()),
-        //     Err(e) => Err(DatabaseError::DbError(e.to_string())),
-        // }
-        Ok("".to_string())
+        let v = sqlx::query("select sqlite_version() as version;")
+            .fetch_one(&self.pool)
+            .await?;
+        let s = v.try_get::<String, _>("version")?;
+
+        Ok(s)
     }
 }
