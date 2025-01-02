@@ -3,7 +3,7 @@ use crate::state::AppState;
 
 use axum::{extract::State, http::StatusCode, Json};
 use serde::Serialize;
-use tracing::{debug, error, info};
+use tracing::{debug, error};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct PingResp {

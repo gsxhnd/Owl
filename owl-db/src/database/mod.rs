@@ -12,5 +12,3 @@ impl From<sqlx::Error> for DatabaseError {
         DatabaseError::DbError(value.to_string())
     }
 }
-
-// pub trait Database {}

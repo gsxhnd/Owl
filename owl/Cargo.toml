@@ -12,6 +12,7 @@ mime_guess = { version = "2" }
 multer = { version = "3" }
 toml = { version = "0.8" }
 rust-embed = { version = "8" }
+validator = { version = "0.19", features = ["derive"] }
 
 utoipa = { workspace = true }
 serde = { workspace = true }

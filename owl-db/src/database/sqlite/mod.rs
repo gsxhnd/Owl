@@ -1,3 +1,5 @@
+pub mod folder;
+
 use crate::database::DatabaseError;
 use sqlx::{
     migrate::Migrator,
