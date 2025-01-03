@@ -14,33 +14,26 @@ import (
 )
 
 type localStorage struct {
-	path   string
-	logger utils.Logger
+	dataPath      string
+	thumbnailPath string
+	logger        utils.Logger
 }
 
 func NewLocalStorage(cfg *utils.Config, l utils.Logger) (Storage, error) {
-	var sPath = path.Join(cfg.DataPath, cfg.Storage.Path)
-
-	// if err := utils.MakeDir(path.Join(sPath, "actor")); err != nil {
-	// 	return nil, err
-	// }
-
-	// if err := utils.MakeDir(path.Join(sPath, "movie")); err != nil {
-	// 	return nil, err
-	// }
+	dataPath := path.Join(cfg.DataPath)
+	thumbnailPath := path.Join(cfg.DataPath, ".owl")
 
 	for i := 0; i <= 255; i++ {
 		hex := fmt.Sprintf("%02x", i)
-		if err := os.MkdirAll(path.Join(sPath, "movie", hex), os.ModePerm); err != nil {
-			fmt.Println(err)
-		}
-		if err := os.MkdirAll(path.Join(sPath, "actor", hex), os.ModePerm); err != nil {
-			fmt.Println(err)
+		if err := os.MkdirAll(path.Join(thumbnailPath, "thumbnail", hex), os.ModePerm); err != nil {
+			l.Errorw("mkdir thumbnail path failed", "error", err)
+			return nil, err
 		}
 	}
 
 	return &localStorage{
-		path: sPath,
+		dataPath:      dataPath,
+		thumbnailPath: thumbnailPath,
 	}, nil
 }
 
@@ -49,7 +42,7 @@ func (s *localStorage) Ping() error {
 }
 
 func (s *localStorage) GetImage(cover string, id uint, filename string) ([]byte, string, error) {
-	var filepath = path.Join(s.path, cover, "1.jpeg")
+	filepath := path.Join(s.dataPath, cover, "1.jpeg")
 	file, err := os.Open(filepath)
 	if err != nil {
 		return nil, "", err
@@ -57,7 +50,7 @@ func (s *localStorage) GetImage(cover string, id uint, filename string) ([]byte,
 	defer file.Close()
 
 	var buf bytes.Buffer
-	var tee = io.TeeReader(file, &buf)
+	tee := io.TeeReader(file, &buf)
 
 	_, f, err := image.Decode(tee)
 	if err != nil {
@@ -72,7 +65,7 @@ func (s *localStorage) GetImage(cover string, id uint, filename string) ([]byte,
 func (s *localStorage) SaveImage(data []byte, cover string, id uint, filename string) error {
 	hex := fmt.Sprintf("%02x", id&0xff)
 
-	if err := os.WriteFile(path.Join(s.path, cover, hex, filename), data, 0644); err != nil {
+	if err := os.WriteFile(path.Join(s.dataPath, cover, hex, filename), data, 0644); err != nil {
 		s.logger.Errorf("Local save image error: %s", err.Error())
 		return err
 	}

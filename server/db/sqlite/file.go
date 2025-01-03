@@ -86,17 +86,17 @@ func (db *sqliteDB) UpdateFile(anime model.File) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(anime.Title, anime.Cover, anime.PublishDate, anime.UpdatedAt, anime.Id)
-	if err != nil {
-		db.logger.Errorf(err.Error())
-		return err
-	}
+	// _, err = stmt.Exec(anime.Title, anime.Cover, anime.PublishDate, anime.UpdatedAt, anime.Id)
+	// if err != nil {
+	// 	db.logger.Errorf(err.Error())
+	// 	return err
+	// }
 
 	err = tx.Commit()
 	return err
 }
 
-func (db *sqliteDB) GetAnimes(p *database.Pagination) ([]model.Anime, error) {
+func (db *sqliteDB) GetFiles(p *database.Pagination) ([]model.File, error) {
 	rows, err := db.conn.Query("SELECT * FROM anime;")
 	if err != nil {
 		db.logger.Errorf(err.Error())
@@ -106,7 +106,7 @@ func (db *sqliteDB) GetAnimes(p *database.Pagination) ([]model.Anime, error) {
 
 	var dataList []model.File
 	for rows.Next() {
-		var data = model.File{}
+		data := model.File{}
 		if err := rows.Scan(
 			&data.Id,
 			&data.CreatedAt,

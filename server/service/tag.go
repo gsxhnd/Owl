@@ -47,5 +47,5 @@ func (s tagService) GetTags() ([]model.Tag, error) {
 }
 
 func (s tagService) SearchTagsByName(name string) ([]model.Tag, error) {
-	return s.db.SearchTagsByName(name)
+	return nil, nil
 }

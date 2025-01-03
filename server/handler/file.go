@@ -11,9 +11,8 @@ import (
 )
 
 type FileHandler interface {
-	// CreateAnime(ctx *fiber.Ctx) error
+	CreateFile(ctx *fiber.Ctx) error
 	DeleteFiles(ctx *fiber.Ctx) error
-	// UpdateAnime(ctx *fiber.Ctx) error
 	GetFile(ctx *fiber.Ctx) error
 	GetFiles(ctx *fiber.Ctx) error
 }
@@ -38,8 +37,8 @@ func NewFileHandler(svc service.FileService, v *validator.Validate, l utils.Logg
 // @Produce      json
 // @Success      200
 // @Router       /anime [post]
-func (h *fileHandle) CreateAnime(ctx *fiber.Ctx) error {
-	var body = make([]model.File, 0)
+func (h *fileHandle) CreateFile(ctx *fiber.Ctx) error {
+	var body model.File
 	if err := ctx.BodyParser(&body); err != nil {
 		h.logger.Errorf(err.Error())
 		return ctx.JSON(errno.DecodeError(err))
@@ -49,7 +48,7 @@ func (h *fileHandle) CreateAnime(ctx *fiber.Ctx) error {
 		return ctx.JSON(errno.DecodeError(err))
 	}
 
-	err := h.svc.CreateAnimes(body)
+	err := h.svc.CreateFile(body)
 	return ctx.JSON(errno.DecodeError(err))
 }
 
@@ -60,7 +59,7 @@ func (h *fileHandle) CreateAnime(ctx *fiber.Ctx) error {
 // @Success      200
 // @Router       /anime [delete]
 func (h *fileHandle) DeleteFiles(ctx *fiber.Ctx) error {
-	var body = make([]uint, 0)
+	body := make([]uint, 0)
 	if err := ctx.BodyParser(&body); err != nil {
 		h.logger.Errorf(err.Error())
 		return ctx.JSON(errno.DecodeError(err))
@@ -70,7 +69,7 @@ func (h *fileHandle) DeleteFiles(ctx *fiber.Ctx) error {
 		return ctx.JSON(errno.DecodeError(err))
 	}
 
-	err := h.svc.DeleteAnimes(body)
+	err := h.svc.DeleteFiles(body)
 	return ctx.JSON(errno.DecodeError(err))
 }
 
@@ -81,7 +80,7 @@ func (h *fileHandle) DeleteFiles(ctx *fiber.Ctx) error {
 // @Success      200
 // @Router       /anime [get]
 func (h *fileHandle) GetFiles(ctx *fiber.Ctx) error {
-	var p = database.Pagination{
+	p := database.Pagination{
 		Limit:  uint64(ctx.QueryInt("page_size", 50)),
 		Offset: uint64(ctx.QueryInt("page_size", 50) * ctx.QueryInt("page", 0)),
 	}

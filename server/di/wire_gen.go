@@ -35,29 +35,26 @@ func InitApp() (*Application, error) {
 	}
 	pingService := service.NewPingService(logger, driver, storageStorage)
 	pingHandler := handler.NewPingHandler(pingService)
-	movieService := service.NewMovieService(logger, driver, storageStorage)
+	folderService := service.NewFolderService(logger, driver, storageStorage)
 	validate := utils.NewValidator()
-	movieHandler := handler.NewMovieHandler(movieService, validate, storageStorage, logger)
-	movieActorService := service.NewMovieActorService(logger, driver)
-	movieActorHandler := handler.NewMovieActorHandler(movieActorService, validate, logger)
-	movieTagService := service.NewMovieTagService(logger, driver)
-	movieTagHandler := handler.NewMovieTagHandler(movieTagService, validate, logger)
-	actorService := service.NewActorService(logger, driver)
-	actorHandler := handler.NewActorHandler(actorService, validate, logger)
-	imageHandler := handler.NewImageHandler(validate, storageStorage, logger)
+	folderHandler := handler.NewFolderHandler(folderService, validate, storageStorage, logger)
+	fileService := service.NewFileService(logger, driver)
+	fileHandler := handler.NewFileHandler(fileService, validate, logger)
 	tagService := service.NewTagService(logger, driver)
 	tagHandler := handler.NewTagHandler(tagService, validate, logger)
-	animeService := service.NewAnimeService(logger, driver)
-	animeHandler := handler.NewAnimeHandler(animeService, validate, logger)
+	fileTagService := service.NewFileTagService(logger, driver)
+	fileTagHandler := handler.NewFileTagHandler(fileTagService, validate, logger)
+	labelService := service.NewLabelService(logger, driver)
+	labelHandler := handler.NewLabelHandler(labelService, validate, logger)
+	imageHandler := handler.NewImageHandler(validate, storageStorage, logger)
 	handlerHandler := handler.Handler{
-		PingHandler:      pingHandler,
-		MovieHandler:     movieHandler,
-		MovieActorHandle: movieActorHandler,
-		MovieTagHandler:  movieTagHandler,
-		ActorHandler:     actorHandler,
-		ImageHandler:     imageHandler,
-		TagHandler:       tagHandler,
-		AnimeHandler:     animeHandler,
+		PingHandler:    pingHandler,
+		FolderHandler:  folderHandler,
+		FileHandler:    fileHandler,
+		TagHandler:     tagHandler,
+		FileTagHandler: fileTagHandler,
+		LabelHandler:   labelHandler,
+		ImageHandler:   imageHandler,
 	}
 	routerRouter, err := router.NewRouter(config, logger, middlewareMiddleware, handlerHandler)
 	if err != nil {

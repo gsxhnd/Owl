@@ -8,7 +8,7 @@ import (
 )
 
 type FolderService interface {
-	CreateFolder([]model.Folder) error
+	CreateFolder(model.Folder) error
 	DeleteFolder(ids []uint) error
 	UpdateFolder(*model.Folder) error
 	GetFolders(*database.Pagination) ([]model.Folder, error)
@@ -28,8 +28,11 @@ func NewFolderService(l utils.Logger, db database.Driver, s storage.Storage) Fol
 	}
 }
 
-func (s *folderService) CreateFolder(movies []model.Folder) error {
-	return s.db.CreateFolder(movies)
+func (s *folderService) CreateFolder(folder model.Folder) error {
+	folders := make([]model.Folder, 0)
+	folders = append(folders, folder)
+
+	return s.db.CreateFolders(folders)
 }
 
 func (s *folderService) DeleteFolder(ids []uint) error {

@@ -25,9 +25,9 @@ func NewPingHandler(svc service.PingService) PingHandler {
 // @Success      200
 // @Router       /ping [get]
 func (h *pingHandle) Ping(ctx *fiber.Ctx) error {
-	err := h.svc.Ping()
+	resp, err := h.svc.Ping()
 	if err != nil {
-		return ctx.Status(500).SendString(err.Error())
+		return ctx.Status(500).JSON(errno.InternalServerError)
 	}
-	return ctx.JSON(errno.DecodeError(errno.InternalServerError))
+	return ctx.JSON(errno.OK.WithData(resp))
 }

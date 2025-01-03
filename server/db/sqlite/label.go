@@ -7,7 +7,7 @@ import (
 	"github.com/gsxhnd/owl/server/model"
 )
 
-func (db *sqliteDB) CreateActors(actors []model.Actor) error {
+func (db *sqliteDB) CreateLabels(actors []model.Label) error {
 	tx, err := db.conn.Begin()
 	defer db.txRollback(tx, err)
 	if err != nil {
@@ -36,7 +36,7 @@ func (db *sqliteDB) CreateActors(actors []model.Actor) error {
 	return err
 }
 
-func (db *sqliteDB) DeleteActors(ids []uint) error {
+func (db *sqliteDB) DeleteLabels(ids []uint) error {
 	tx, err := db.conn.Begin()
 	defer db.txRollback(tx, err)
 	if err != nil {
@@ -63,7 +63,7 @@ func (db *sqliteDB) DeleteActors(ids []uint) error {
 	return err
 }
 
-func (db *sqliteDB) UpdateActor(actor *model.Actor) error {
+func (db *sqliteDB) UpdateLabel(actor *model.Label) error {
 	tx, err := db.conn.Begin()
 	defer db.txRollback(tx, err)
 	if err != nil {
@@ -90,7 +90,7 @@ func (db *sqliteDB) UpdateActor(actor *model.Actor) error {
 	return err
 }
 
-func (db *sqliteDB) GetActors() ([]model.Actor, error) {
+func (db *sqliteDB) GetLabels() ([]model.Label, error) {
 	rows, err := db.conn.Query("SELECT * FROM actor;")
 	if err != nil {
 		db.logger.Errorf(err.Error())
@@ -98,27 +98,9 @@ func (db *sqliteDB) GetActors() ([]model.Actor, error) {
 	}
 	defer rows.Close()
 
-	var dataList []model.Actor
+	var dataList []model.Label
 	for rows.Next() {
-		var data = model.Actor{}
-		if err := rows.Scan(&data.Id, &data.Name, &data.AliasName, &data.Cover, &data.CreatedAt, &data.UpdatedAt); err != nil {
-			db.logger.Errorf(err.Error())
-			return nil, err
-		}
-		dataList = append(dataList, data)
-	}
-	return dataList, nil
-}
-
-func (db *sqliteDB) SearchActorByName(name string) ([]model.Actor, error) {
-	rows, err := db.conn.Query("SELECT * FROM actor WHERE name like ? or alias_name like ?;", "%"+name+"%", "%"+name+"%")
-	if err != nil {
-		db.logger.Errorf(err.Error())
-		return nil, err
-	}
-	var dataList []model.Actor
-	for rows.Next() {
-		var data = model.Actor{}
+		data := model.Label{}
 		if err := rows.Scan(&data.Id, &data.Name, &data.AliasName, &data.Cover, &data.CreatedAt, &data.UpdatedAt); err != nil {
 			db.logger.Errorf(err.Error())
 			return nil, err

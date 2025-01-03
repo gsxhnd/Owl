@@ -4,36 +4,44 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/gsxhnd/owl/server/db/database"
 	"github.com/gsxhnd/owl/server/model"
 )
 
-func (db *sqliteDB) CreateFolder(folders []model.Folder) error {
+func (db *sqliteDB) CreateFolders(folders []model.Folder) error {
 	tx, err := db.conn.Begin()
-	defer db.txRollback(tx, err)
 	if err != nil {
 		db.logger.Errorf(err.Error())
 		return err
 	}
+	defer db.txRollback(tx, err)
 
-	stmt, err := tx.Prepare(`INSERT INTO folder 
-	(code,title,publish_date,director,produce_company,publish_company,series) 
-	VALUES (?,?,?,?,?,?,?);`)
+	db.logger.Debugw("[sqlite] create folder, get data", "data", folders)
+	builder := sq.Insert("folder").Columns("name", "pid")
+	for _, v := range folders {
+		builder = builder.Values(v.Name, v.Pid)
+	}
+
+	sql, args, err := builder.ToSql()
 	if err != nil {
-		db.logger.Errorf(err.Error())
+		db.logger.Errorw("[sqlite] create folder sql failed", "error", err)
+		return err
+	}
+	db.logger.Debugw("[sqlite] create folder sql generate", "sql", sql, "args", args)
+
+	stmt, err := db.conn.Prepare(sql)
+	if err != nil {
+		db.logger.Errorw("[sqlite] create folder prepare failed", "error", err)
 		return err
 	}
 	defer stmt.Close()
 
-	for _, v := range folders {
-		_, err = stmt.Exec(v.Code, v.Title, v.PublishDate, v.Director, v.ProduceCompany, v.PublishCompany, v.Series)
-		if err != nil {
-			db.logger.Errorf(err.Error())
-			return err
-		}
+	_, err = tx.Stmt(stmt).Exec(args...)
+	if err != nil {
+		db.logger.Errorw("[sqlite] create folder exec error", "error", err)
+		return err
 	}
 
 	err = tx.Commit()
@@ -78,38 +86,38 @@ func (db *sqliteDB) UpdateFolder(movie *model.Folder) error {
 		return err
 	}
 
-	stmt, err := tx.Prepare(`UPDATE movie SET 
-	code=?, title=?,cover=?,publish_date=?,director=?,produce_company=?,publish_company=?,series=?, updated_at=? 
-	WHERE id=?;`)
-	if err != nil {
-		db.logger.Errorf(err.Error())
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(
-		movie.Code,
-		movie.Title,
-		movie.Cover,
-		movie.PublishDate,
-		movie.Director,
-		movie.ProduceCompany,
-		movie.PublishCompany,
-		movie.Series,
-		time.Now(),
-		movie.Id,
-	)
-	if err != nil {
-		db.logger.Errorf(err.Error())
-		return err
-	}
-
+	// stmt, err := tx.Prepare(`UPDATE movie SET
+	// code=?, title=?,cover=?,publish_date=?,director=?,produce_company=?,publish_company=?,series=?, updated_at=?
+	// WHERE id=?;`)
+	// if err != nil {
+	// 	db.logger.Errorf(err.Error())
+	// 	return err
+	// }
+	// defer stmt.Close()
+	//
+	// _, err = stmt.Exec(
+	// 	movie.Code,
+	// 	movie.Title,
+	// 	movie.Cover,
+	// 	movie.PublishDate,
+	// 	movie.Director,
+	// 	movie.ProduceCompany,
+	// 	movie.PublishCompany,
+	// 	movie.Series,
+	// 	time.Now(),
+	// 	movie.Id,
+	// )
+	// if err != nil {
+	// 	db.logger.Errorf(err.Error())
+	// 	return err
+	// }
+	//
 	err = tx.Commit()
 	return err
 }
 
-func (db *sqliteDB) GetFolders(p *database.Pagination, filter ...string) ([]model.Movie, error) {
-	query := sq.Select("*").From("movie")
+func (db *sqliteDB) GetFolders(p *database.Pagination, filter ...string) ([]model.Folder, error) {
+	query := sq.Select("*").From("folder")
 	if p != nil {
 		query = query.Limit(p.Limit).Offset(p.Offset)
 	}
@@ -137,7 +145,7 @@ func (db *sqliteDB) GetFolders(p *database.Pagination, filter ...string) ([]mode
 
 	var dataList []model.Folder
 	for rows.Next() {
-		var data = model.Folder{}
+		data := model.Folder{}
 		if err := rows.Scan(
 			&data.Id,
 			&data.CreatedAt,

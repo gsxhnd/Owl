@@ -61,7 +61,23 @@ func (db *sqliteDB) Migrate() error {
 	return nil
 }
 
+func (db *sqliteDB) Version() (string, error) {
+	rows, err := db.conn.Query("select sqlite_version() as version;")
+	if err != nil {
+		return "", err
+	}
+
+	var version string
+	if rows.Next() {
+
+		err = rows.Scan(&version)
+		return version, err
+	}
+	return "", nil
+}
+
 func (db *sqliteDB) txRollback(tx *sql.Tx, err error) {
+	db.logger.Debugw("db tx rollback", "error", err)
 	if err != nil {
 		errRb := tx.Rollback()
 		db.logger.Errorf(errRb.Error())

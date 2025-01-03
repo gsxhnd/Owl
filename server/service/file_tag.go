@@ -24,9 +24,9 @@ func NewFileTagService(l utils.Logger, db database.Driver) FileTagService {
 }
 
 func (s *fileTagService) CreateFileTags(movieTags []model.FileTag) error {
-	return s.db.CreateMovieTags(movieTags)
+	return nil
 }
 
 func (s *fileTagService) DeleteFileTags(ids []uint) error {
-	return s.db.DeleteMovieTags(ids)
+	return nil
 }

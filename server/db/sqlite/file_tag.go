@@ -6,7 +6,7 @@ import (
 	"github.com/gsxhnd/owl/server/model"
 )
 
-func (db *sqliteDB) CreateMovieTags(movieTags []model.MovieTag) error {
+func (db *sqliteDB) CreateFileTags(movieTags []model.FileTag) error {
 	tx, err := db.conn.Begin()
 	defer db.txRollback(tx, err)
 	if err != nil {
@@ -23,14 +23,14 @@ func (db *sqliteDB) CreateMovieTags(movieTags []model.MovieTag) error {
 	}
 	defer stmt.Close()
 
-	for _, v := range movieTags {
-		_, err = stmt.Exec(v.MovieId, v.TagId)
-		if err != nil {
-			db.logger.Errorf(err.Error())
-			return err
-		}
-	}
-
+	// for _, v := range movieTags {
+	// 	_, err = stmt.Exec(v.MovieId, v.TagId)
+	// 	if err != nil {
+	// 		db.logger.Errorf(err.Error())
+	// 		return err
+	// 	}
+	// }
+	//
 	err = tx.Commit()
 	return err
 }
@@ -63,7 +63,7 @@ func (db *sqliteDB) DeleteMovieTags(ids []uint) error {
 	return err
 }
 
-func (db *sqliteDB) UpdateMovieTag(movieTag model.MovieTag) error {
+func (db *sqliteDB) UpdateMovieTag(movieTag *model.FileTag) error {
 	tx, err := db.conn.Begin()
 	defer db.txRollback(tx, err)
 	if err != nil {
@@ -80,17 +80,17 @@ func (db *sqliteDB) UpdateMovieTag(movieTag model.MovieTag) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(movieTag.MovieId, movieTag.TagId, movieTag.Id)
-	if err != nil {
-		db.logger.Errorf(err.Error())
-		return err
-	}
+	// _, err = stmt.Exec(movieTag.MovieId, movieTag.TagId, movieTag.Id)
+	// if err != nil {
+	// 	db.logger.Errorf(err.Error())
+	// 	return err
+	// }
 
 	err = tx.Commit()
 	return err
 }
 
-func (db *sqliteDB) GetMovieTags() ([]model.MovieTag, error) {
+func (db *sqliteDB) GetMovieTags() ([]model.FileTag, error) {
 	rows, err := db.conn.Query("SELECT id, movie_id, tag_id FROM movie_tag;")
 	if err != nil {
 		db.logger.Errorf(err.Error())
@@ -98,37 +98,14 @@ func (db *sqliteDB) GetMovieTags() ([]model.MovieTag, error) {
 	}
 	defer rows.Close()
 
-	var dataList []model.MovieTag
-	for rows.Next() {
-		var data = model.MovieTag{}
-		if err := rows.Scan(&data.Id, &data.MovieId, &data.TagId); err != nil {
-			db.logger.Errorf(err.Error())
-			return nil, err
-		}
-		dataList = append(dataList, data)
-	}
-	return dataList, nil
-}
-
-func (db *sqliteDB) GetMovieTagByMovieId(movieId uint) ([]model.MovieTag, error) {
-	rows, err := db.conn.Query(`SELECT mt.id, mt.movie_id, mt.tag_id, t.name as tag_name
-FROM movie_tag as mt
-         LEFT JOIN tag t on t.id = mt.tag_id
-where movie_id = ?;`, movieId)
-	if err != nil {
-		db.logger.Errorf(err.Error())
-		return nil, err
-	}
-	defer rows.Close()
-
-	var dataList []model.MovieTag
-	for rows.Next() {
-		var data = model.MovieTag{}
-		if err := rows.Scan(&data.Id, &data.MovieId, &data.TagId, &data.TagName); err != nil {
-			db.logger.Errorf(err.Error())
-			return nil, err
-		}
-		dataList = append(dataList, data)
-	}
-	return dataList, nil
+	// var dataList []model.MovieTag
+	// for rows.Next() {
+	// 	data := model.MovieTag{}
+	// 	if err := rows.Scan(&data.Id, &data.MovieId, &data.TagId); err != nil {
+	// 		db.logger.Errorf(err.Error())
+	// 		return nil, err
+	// 	}
+	// 	dataList = append(dataList, data)
+	// }
+	return nil, nil
 }

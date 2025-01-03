@@ -7,7 +7,7 @@ import (
 )
 
 type PingService interface {
-	Ping() error
+	Ping() (*pingResp, error)
 }
 
 type pingService struct {
@@ -24,16 +24,28 @@ func NewPingService(l utils.Logger, db database.Driver, s storage.Storage) PingS
 	}
 }
 
-func (p *pingService) Ping() error {
+type pingResp struct {
+	DBVersion string `json:"db_version"`
+}
+
+func (p *pingService) Ping() (*pingResp, error) {
 	if err := p.db.Ping(); err != nil {
 		p.logger.Errorf(err.Error())
-		return err
+		return nil, err
 	}
 
 	if err := p.storage.Ping(); err != nil {
 		p.logger.Errorf(err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	version, err := p.db.Version()
+	if err != nil {
+		p.logger.Errorf(err.Error())
+		return nil, err
+	}
+
+	return &pingResp{
+		DBVersion: version,
+	}, nil
 }

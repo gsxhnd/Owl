@@ -17,14 +17,11 @@ func Test_sqliteDB_CreateMovies(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			db, err := getMockDB()
 			assert.Nil(t, err)
-			var list = make([]model.Movie, 0)
-			var data = model.Movie{
-				Code:        "123",
-				PublishDate: nil,
-			}
+			list := make([]model.Folder, 0)
+			data := model.Folder{}
 			list = append(list, data)
 
-			db.CreateMovies(list)
+			db.CreateFolders(list)
 		})
 	}
 }
@@ -40,7 +37,7 @@ func Test_sqliteDB_DeleteMovies(t *testing.T) {
 			db, err := getMockDB()
 			assert.Nil(t, err)
 
-			db.DeleteMovies([]uint{3, 4, 5})
+			db.DeleteFolders([]uint{3, 4, 5})
 		})
 	}
 }
@@ -56,7 +53,7 @@ func Test_sqliteDB_GetMovies(t *testing.T) {
 			db, err := getMockDB()
 			assert.Nil(t, err)
 
-			db.GetMovies(nil)
+			db.GetFolders(nil)
 		})
 	}
 }

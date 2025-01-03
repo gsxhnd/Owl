@@ -4,22 +4,23 @@ import "github.com/gsxhnd/owl/server/model"
 
 type Driver interface {
 	Ping() error
+	Version() (string, error)
 	Migrate() error
 	CreateFolders([]model.Folder) error
 	DeleteFolders([]uint) error
 	UpdateFolder(*model.Folder) error
 	GetFolders(*Pagination, ...string) ([]model.Folder, error)
-	// CreateFile() error
-	// DeleteFiles() error
+	CreateFiles([]model.File) error
+	DeleteFiles([]uint) error
 	// CreateActors([]model.Actor) error
 	// DeleteActors([]uint) error
 	// UpdateActor(actor *model.Actor) error
 	// GetActors() ([]model.Actor, error)
 	// SearchActorByName(string) ([]model.Actor, error)
-	// CreateTags([]model.Tag) error
-	// DeleteTags([]uint) error
-	// UpdateTag(tag *model.Tag) error
-	// GetTags() ([]model.Tag, error)
+	CreateTags([]model.Tag) error
+	DeleteTags([]uint) error
+	UpdateTag(tag *model.Tag) error
+	GetTags() ([]model.Tag, error)
 	// SearchTagsByName(name string) ([]model.Tag, error)
 	// CreateMovieActors(movieActors []model.MovieActor) error
 	// DeleteMovieActors(ids []uint) error

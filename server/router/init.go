@@ -23,14 +23,13 @@ type router struct {
 	m      middleware.Middleware
 }
 
-// @title           Jaha API
-// @version         1
+// @title           Owl API
+// @version         0.0.1
 // @description     This is a sample server celler server.
 // @license.name  MIT
 // @license.url   https://opensource.org/license/mit
 // @host      localhost:8080
 // @BasePath  /api/v1
-// @securityDefinitions.basic  BasicAuth
 // @externalDocs.description  OpenAPI
 func NewRouter(cfg *utils.Config, l utils.Logger, m middleware.Middleware, h handler.Handler) (Router, error) {
 	app := fiber.New(fiber.Config{
@@ -56,8 +55,8 @@ func (r *router) Run() error {
 	// folder api
 	api.Post("/folder", r.h.FolderHandler.CreateFolder)
 	api.Delete("/folder", r.h.FolderHandler.DeleteFolder)
-	api.Put("/movie", r.h.FolderHandler.UpdateFolder)
-	api.Get("/movie", r.h.FolderHandler.GetFolders)
+	api.Put("/folder", r.h.FolderHandler.UpdateFolder)
+	api.Get("/folder", r.h.FolderHandler.GetFolders)
 	// file api
 	api.Delete("/file", r.h.FileHandler.DeleteFiles)
 	api.Get("/file", r.h.FileHandler.GetFiles)

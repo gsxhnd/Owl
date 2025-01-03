@@ -25,22 +25,18 @@ func NewLabelService(l utils.Logger, db database.Driver) LabelService {
 	}
 }
 
-// CreateActors implements ActorService.
 func (s labelService) CreateLabels(actors []model.Label) error {
-	return s.db.CreateActors(actors)
+	return nil
 }
 
-// DeleteActors implements labelService.
 func (s labelService) DeleteLabels(ids []uint) error {
-	return s.db.DeleteActors(ids)
+	return nil
 }
 
-// UpdateActor implements labelService.
 func (s labelService) UpdateLabels(actor *model.Label) error {
-	return s.db.UpdateActor(actor)
+	return nil
 }
 
-// GetActors implements labelService.
 func (s labelService) GetLabels(p *database.Pagination) ([]model.Label, error) {
-	return s.db.GetActors()
+	return nil, nil
 }
